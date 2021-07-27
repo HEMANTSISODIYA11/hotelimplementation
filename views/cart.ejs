@@ -1,0 +1,306 @@
+<!Doctype html>
+<html>
+
+<head>
+    <title>Cart Page</title>
+    <style>
+        /* Popup container */
+        
+        .popup {
+            position: relative;
+            display: inline-block;
+            cursor: pointer;
+        }
+        /* The actual popup (appears on top) */
+        
+        .popup .popuptext {
+            visibility: hidden;
+            width: 300px;
+            background-color: #555;
+            color: #fff;
+            text-align: center;
+            border-radius: 6px;
+            padding: 8px 0;
+            position: absolute;
+            z-index: 1;
+            bottom: 100%;
+            left: 50%;
+            margin-left: 80px;
+        }
+        /* Popup arrow */
+        
+        .popup .popuptext::after {
+            content: "";
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            margin-left: 15px;
+            border-width: 5px;
+            border-style: solid;
+            border-color: #555 transparent transparent transparent;
+        }
+        /* Toggle this class when clicking on the popup container (hide and show the popup) */
+        
+        .popup .show {
+            visibility: visible;
+            -webkit-animation: fadeIn 1s;
+            animation: fadeIn 1s
+        }
+        /* Add animation (fade in the popup) */
+        
+        @-webkit-keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <%var i=0;%>
+
+        <div class="hotel">
+            <img src="" alt="hotel">
+            <h1>
+                <%= hotel.name %>
+            </h1>
+            <p>
+                <%=hotel.description%>
+            </p>
+            <p>
+                <%=hotel.timing%>
+            </p>
+            <p>
+                <%=hotel.status%>
+            </p>
+            <div class="menu">
+
+                <%items.forEach(function(element){%>
+                    <div class="item <%=i%>">
+                        <h3>
+                            <%=element.name%>
+                        </h3>
+                        <p>
+                            Price:
+                            <%=element.price%>
+                        </p>
+                        <p>
+                            Type:
+                            <%=element.Type%>
+                        </p>
+                        <p>
+                            Tags:
+                            <%=element.tag%>
+                        </p>
+                        <button class="button add <%=element.name%> <%=element.price%>" id="<%=element.id%>">+ </button>
+                        <%var j=0%>
+
+                            <%  if(lastorder){ %>
+                                <% for( j=0;j<lastorder.orderItems.length;j++){ %>
+                                    <% if(element.id === lastorder.orderItems[j].item_id){ %>
+                                        <span class="itemquantity <%=element.id%>"><%=lastorder.orderItems[j].quantity%></span>
+                                        <% break%>
+                                            <% } %>
+                                                <% } %>
+                                                    <% if(j ===lastorder.orderItems.length){ %>
+                                                        <span class="itemquantity <%=element.id%>">0</span>
+                                                        <%}%>
+                                                            <%  }  else{ %>
+                                                                <span class="itemquantity <%=element.id%>">0</span>
+                                                                <% } %>
+                                                                    <button class="button delete  <%=element.price%>" id="<%=element.id%>"> -</button>
+
+                    </div>
+                    <% }) %>
+
+            </div>
+        </div>
+
+
+        <p id="cart"></p>
+
+        <div class="popup">
+            <span class="popuptext" id="myPopup"></span>
+        </div>
+
+
+        <!-- <button onclick="AddToPara()">Checkout</button> -->
+
+        <form action="/orderitem" method="POST">
+            <!-- <input type="hidden" name="hotelid" value="////customerId//"> -->
+            <input type="hidden" name="hotelid" value="<%=hotel._id%>">
+            <input type="hidden" id="orderitem" name="orderitem" value=" ">
+            <label for="mobile">Enter Mobile Number</label>
+            <input type="text" name="mobile" required>
+
+            <button type="Submit">Checkout</button>
+        </form>
+
+
+
+        <script>
+            var arr = [];
+            var totalprice = 0;
+
+            var strObj = <%-JSON.stringify(lastorder)%>;
+
+            if (strObj) {
+                var arr = strObj.orderItems;
+                var totalprice = strObj.billAmount;
+                showcart();
+                AddToPara();
+            } else {
+                var arr = [];
+                var totalprice = 0;
+            }
+
+            var buttons = document.querySelectorAll(".button");
+            var buttonsCount = buttons.length;
+            for (var i = 0; i <= buttonsCount; i += 1) {
+                buttons[i].onclick = function(e) {
+                    console.log(e);
+
+                    var valueclass = "itemquantity " + e.target.id;
+
+                    console.log("valueclass is " + valueclass);
+
+
+                    if (e.target.classList[1] === "add") {
+
+
+
+                        console.log("id is " + e.target.id);
+                        console.log("array lenght is " + arr.length);
+
+                        var itemname = e.target.classList[2];
+
+                        const itemprice = e.target.classList[3];
+                        console.log(itemprice);
+
+                        if (arr) {
+                            var Isobject = arr.find(function(element) {
+                                return element.item_id === e.target.id;
+                            });
+                            if (Isobject === undefined) {
+                                var object = {
+                                    item_id: e.path[0].id,
+                                    quantity: 1
+                                }
+                                totalprice = totalprice + 1 * itemprice;
+                                object.name = itemname;
+                                arr.push(object);
+
+                                document.getElementsByClassName(valueclass)[0].textContent = object.quantity;
+
+                            } else {
+                                var index = arr.indexOf(Isobject);
+                                arr[index].quantity++;
+
+                                totalprice = totalprice + 1 * itemprice;
+
+                                document.getElementsByClassName(valueclass)[0].textContent = arr[index].quantity;
+                            }
+
+                        } else {
+                            var object = {
+                                item_id: e.path[0].id,
+                                quantity: 1
+                            }
+                            object.name = itemname;
+                            totalprice = totalprice + 1 * itemprice;
+                            arr.push(object);
+
+                            document.getElementsByClassName(valueclass)[0].textContent = object.quantity;
+                        }
+                        console.log(arr);
+
+                        showcart();
+                        AddToPara();
+
+                    } else if (e.target.classList[1] === "delete") {
+                        console.log("id is " + e.target.id);
+
+
+                        const itemprice = e.target.classList[2];
+                        console.log(itemprice);
+
+                        if (arr) {
+                            var Isobject = arr.find(function(element) {
+                                return element.item_id === e.target.id;
+                            });
+                            if (Isobject !== undefined) {
+                                var index = arr.indexOf(Isobject);
+                                console.log(index);
+                                if (arr[index].quantity > 1) {
+                                    arr[index].quantity--;
+
+                                    console.log(typeof(totalprice));
+                                    console.log((itemprice));
+                                    totalprice -= Number(itemprice);
+                                    console.log("totalprice is " + totalprice);
+                                    document.getElementsByClassName(valueclass)[0].textContent = arr[index].quantity;
+
+                                } else if (arr[index].quantity === 1) {
+                                    arr = arr.filter(function(element) {
+                                        return element.item_id !== e.target.id;
+                                    });
+                                    totalprice -= Number(itemprice);
+                                    document.getElementsByClassName(valueclass)[0].textContent = 0;
+                                }
+                            }
+                        }
+                        console.log(arr);
+
+
+                        showcart();
+                        AddToPara();
+                    }
+                }
+            }
+
+
+
+            function AddToPara() {
+                document.querySelector("#orderitem").value = JSON.stringify(arr);
+                console.log(arr);
+                console.log(totalprice);
+            }
+
+
+            function showcart() {
+                var text = "<p><h3>Total Price:-" + totalprice + "</h3>   <button onclick=" + "myFunction()" + ">View Cart</button></p>";
+                document.querySelector("#cart").innerHTML = text;
+            }
+
+
+            function myFunction() {
+                var popup = document.getElementById("myPopup");
+
+                var text = "<h1>Your Cart:  </h1>";
+                arr.forEach(function(element) {
+                    text += "<div>" + "<p>Item:-" + element.name + "</p>" + "<p>quantity:-" + element.quantity + "</p></div>"
+                });
+
+                text += "<h3>TotalPrice:-" + totalprice + "</h3>"
+
+                popup.innerHTML = text;
+
+                popup.classList.toggle("show");
+            }
+        </script>
+
+</body>
+
+</html>

@@ -1,0 +1,47 @@
+<Doctype html>
+    <html>
+
+    <head>
+        <meta http-equiv="refresh" content="5">
+        <title>
+            Checkout
+        </title>
+    </head>
+
+    <body>
+        <div>
+            <h1>
+                <%=customer.name%>
+            </h1>
+            <p>Phone :-
+                <%=customer.phone%>
+            </p>
+        </div>
+        <div>
+            <%   order.orderItems.forEach(function(element){  %>
+                <p>Item:-
+                    <%=element.name%> quantity:-
+                        <%=element.quantity%>
+                </p>
+
+                <%  });  %>
+
+                    <h3>Total Amount:-
+                        <%=order.billAmount%>
+                    </h3>
+
+                    <h2>Status:-
+                        <%=order.approved%>
+                    </h2>
+
+                    <%if(order.approved === true){ %>
+                        <button>Make a payment</button>
+                        <% }else{  %>
+                            <p>Wait for the approval of your order!</p>
+                            <p>It May Take few Seconds</p>
+                            <% } %>
+
+        </div>
+    </body>
+
+    </html>

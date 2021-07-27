@@ -1,0 +1,37 @@
+<doctype html>
+    <html>
+
+    <head>
+        <title>HotelS</title>
+    </head>
+
+    <body>
+
+        <% hotels.forEach(function(hotel){  %>
+            <%   if(hotel){  %>
+                <a href="http://localhost:3000/<%=hotel._id%>" style="text-decoration:none">
+                    <div>
+                        <img src="<%=hotel.profileURL%>" alt="<%=hotel.name%>">
+                        <h1>
+                            <%=hotel.name%>
+                        </h1>
+                        <p>
+                            <%=hotel.description%>
+                        </p>
+                        <%  hotel.Tags.forEach(function(tag){ %>
+                            <p>
+                                <%=tag%>
+                            </p>
+                            <% }); %>
+                    </div>
+                </a>
+
+                <% } %>
+
+                    <% }) %>
+
+
+
+    </body>
+
+    </html>

@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+
+
+<head>
+    <meta charset="utf-8">
+    <title>confirm order</title>
+
+</head>
+
+<body>
+
+    <%console.log(orders)%>
+        <% orders.forEach(function(element,index){ %>
+            </div>
+            <h1>
+                <%=index %>
+            </h1>
+            <p>
+                <%=element._id %>
+            </p>
+            <p>
+                <%=element.approved %>
+            </p>
+            <form action="/confirm/<%=element._id%>" method="POST">
+                <label>Confirm The order:-</label>
+                <input type="hidden" name="orderid" value="<%=element._id%>">
+                <input type="submit" name="confirm order">
+            </form>
+            </div>
+            <%   }) %>
+
+
+</body>
+
+</html>
